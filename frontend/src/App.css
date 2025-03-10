@@ -1,0 +1,178 @@
+/* App.css */
+
+/* Global styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+  }
+  
+  /* App container styles */
+  .app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Title styling */
+  .title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 40px;
+  }
+  
+  /* Authentication forms container */
+  .auth-forms {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+  }
+  
+  /* Flexbox layout for the dashboard, credentials, and user manager */
+  .dashboard-container,
+  .credential-manager-container,
+  .user-manager-container {
+    margin-top: 20px;
+  }
+  
+  /* Add some padding and a background color to the forms */
+  form {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  form input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  /* Button styling */
+  button {
+    padding: 12px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+
+    margin-top: 2px;
+    margin-bottom: 5px;
+  }
+  
+  button:hover {
+    background-color: #2980b9;
+  }
+  
+
+
+
+  /* Global combo box (select) styling */
+select {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: #fff;
+    color: #333;
+    appearance: none; /* Removes the default dropdown arrow */
+    -webkit-appearance: none; /* For Safari */
+    -moz-appearance: none; /* For Firefox */
+    outline: none; /* Removes focus outline */
+  }
+  
+  /* Custom dropdown arrow */
+  select::-ms-expand {
+    display: none; /* Remove default dropdown arrow in IE */
+  }
+  
+  /* Style for option elements inside select */
+  select option {
+    padding: 10px;
+    background-color: #fff;
+    color: #333;
+    border: none;
+  }
+  
+  select option:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* Optional: Add some spacing between options for better visual clarity */
+  select option {
+    padding: 10px;
+  }
+  
+
+
+
+
+
+
+  /* Navbar styles */
+.navbar {
+  width: 100%;
+  background-color: #2c3e50; /* Dark blue-gray */
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Left section of the navbar */
+.nav-left {
+  display: flex;
+  gap: 20px;
+}
+
+/* Navigation links */
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: color 0.3s ease-in-out;
+}
+
+.nav-link:hover {
+  color: #f1c40f; /* Gold */
+}
+
+/* Right section of the navbar */
+.nav-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Log Out Button */
+.logout-btn {
+  padding: 10px 15px;
+  background-color: #e74c3c; /* Red */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background 0.3s ease-in-out;
+}
+
+.logout-btn:hover {
+  background-color: #c0392b; /* Darker Red */
+}

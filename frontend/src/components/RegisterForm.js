@@ -118,21 +118,6 @@ const RegisterForm = () => {
       </div>
 
       <div className="mb-4">
-        <label htmlFor="role" className="block text-sm font-medium text-gray-700">Role</label>
-        <select 
-          id="role" 
-          name="role" 
-          value={formData.role} 
-          onChange={handleChange} 
-          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="user">User</option>
-          <option value="management">Management</option>
-          <option value="admin">Admin</option>
-        </select>
-      </div>
-
-      <div className="mb-4">
         <label htmlFor="ou" className="block text-sm font-medium text-gray-700">Organizational Unit (OU)</label>
         <select 
           id="ou" 

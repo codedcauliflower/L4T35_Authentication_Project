@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
 
 const authRoutes = require('./routes/authRoutes');
 const ouRoutes = require('./routes/ous');
@@ -9,6 +10,8 @@ const divisionRoutes = require('./routes/divisions');
 const credentialRoutes = require('./routes/credentials');
 const usersRoute = require('./routes/users');
 
+const verifyRole = require('./middleware/verifyRoles')
+const verifyToken = require('./middleware/verifyToken')
 
 dotenv.config();
 const app = express();
@@ -23,14 +26,12 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'], // Allow headers you are sending
 }));
 
-
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/ous', ouRoutes);
 app.use('/api/divisions', divisionRoutes);
-app.use('/api/credentials', credentialRoutes);
-app.use('/api/users', usersRoute);
-
+app.use('/api/credentials', verifyToken, credentialRoutes);
+app.use('/api/users', verifyToken, verifyRole(['admin']), usersRoute); // Only admins can manage users
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })

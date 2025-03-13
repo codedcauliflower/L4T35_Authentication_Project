@@ -6,10 +6,6 @@ const User = require('../models/User');
 // Fetch all credentials (Admin only)
 exports.getAllCredentials = async (req, res) => {
   try {
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Forbidden: Admins only' });
-    }
-
     const credentials = await Credential.find().populate('division'); 
     return res.json({ success: true, credentials });
 
@@ -87,10 +83,6 @@ exports.updateCredential = async (req, res) => {
     const credential = await Credential.findById(req.params.id);
     if (!credential) {
       return res.status(404).json({ message: 'Credential not found' });
-    }
-
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Forbidden: Admins only' });
     }
 
     // Update credential with new division-OU pair

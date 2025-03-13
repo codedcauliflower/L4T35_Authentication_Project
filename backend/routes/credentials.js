@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
+
 const verifyToken = require('../middleware/verifyToken');
+
 const credentialController = require('../controllers/credentialController');
 
 // Get all credentials

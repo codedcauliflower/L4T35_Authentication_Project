@@ -16,22 +16,15 @@ const CredentialManager = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentCredentialId, setCurrentCredentialId] = useState(null);
   const [error, setError] = useState(null);
-  const [isUnauthorized, setIsUnauthorized] = useState(false); // Track unauthorized state
+  const [isUnauthorized, setIsUnauthorized] = useState(false);
+
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user'));
-  const role = user?.role; // Safe access to the role field
+  const role = user?.role;
 
-  
-  // Check if user is admin, if not, set unauthorized state
+  // Fetch credentials only if the user has valid permissions
   useEffect(() => {
-    if (role !== 'admin') {
-      setIsUnauthorized(true);
-    }
-  }, [role]);
-
-  // Fetch data when not unauthorized
-  useEffect(() => {
-    if (isUnauthorized) return; // Skip data fetching if unauthorized
+    if (!role) return setIsUnauthorized(true); // If no role, deny access
 
     const fetchData = async () => {
       try {
@@ -55,20 +48,22 @@ const CredentialManager = () => {
         setCredentials(credResponse.data.credentials || []);
       } catch (error) {
         if (error.response?.status === 403) {
-          setError('Access Denied');
-        } else if (error.response) {
-          setError('Failed to fetch data: ' + error.response.data.message);
+          setIsUnauthorized(true);
         } else {
-          setError('Failed to fetch data: Network error');
+          setError('Failed to fetch data: ' + error.message);
         }
         console.error('Failed to fetch data:', error);
       }
     };
 
     fetchData();
-  }, [token, selectedOU, isUnauthorized]); // Added `isUnauthorized` to dependency array
+  }, [token, selectedOU, role]);
 
   const handleEditCredential = (credential) => {
+    if (role !== 'management' && role !== 'admin') {
+      alert('Access Denied: You do not have permission to edit credentials.');
+      return;
+    }
     setIsEditing(true);
     setCurrentCredentialId(credential._id);
     setTitle(credential.title);
@@ -83,16 +78,16 @@ const CredentialManager = () => {
       alert('All fields are required');
       return;
     }
-    if (selectedOU === selectedDivision) {
-      alert('OU and Division cannot be the same.');
-      return;
-    }
 
     const newCredential = { title, username, password, division: selectedDivision, ou: selectedOU };
 
     try {
       let response;
       if (isEditing) {
+        if (role !== 'management' && role !== 'admin') {
+          alert('Access Denied: You do not have permission to update credentials.');
+          return;
+        }
         response = await axios.put(`http://localhost:5000/api/credentials/${currentCredentialId}`, newCredential, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -115,6 +110,8 @@ const CredentialManager = () => {
       setPassword('');
       setSelectedDivision('');
       setSelectedOU('');
+
+      window.location.reload();
     } catch (error) {
       if (error.response?.status === 403) {
         setError('Access Denied');
@@ -137,22 +134,25 @@ const CredentialManager = () => {
 
       {!error && (
         <>
-          <CredentialForm
-            title={title}
-            username={username}
-            password={password}
-            selectedOU={selectedOU}
-            selectedDivision={selectedDivision}
-            organizationalUnits={organizationalUnits}
-            divisions={divisions}
-            setTitle={setTitle}
-            setUsername={setUsername}
-            setPassword={setPassword}
-            setSelectedOU={setSelectedOU}
-            setSelectedDivision={setSelectedDivision}
-            handleSubmitCredential={handleSubmitCredential}
-            isEditing={isEditing}
-          />
+          {/* Only normal users and above can add credentials */}
+          {role && (
+            <CredentialForm
+              title={title}
+              username={username}
+              password={password}
+              selectedOU={selectedOU}
+              selectedDivision={selectedDivision}
+              organizationalUnits={organizationalUnits}
+              divisions={divisions}
+              setTitle={setTitle}
+              setUsername={setUsername}
+              setPassword={setPassword}
+              setSelectedOU={setSelectedOU}
+              setSelectedDivision={setSelectedDivision}
+              handleSubmitCredential={handleSubmitCredential}
+              isEditing={isEditing}
+            />
+          )}
 
           <h3>Existing Credentials</h3>
           <CredentialTable credentials={credentials} handleEditCredential={handleEditCredential} />

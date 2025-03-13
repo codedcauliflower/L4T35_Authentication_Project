@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+
+const { authorizeRoles } = require('../middleware/auth');
+
 const User = require('../models/User'); // Assuming you have a User model
 const Division = require('../models/Division'); // Assuming you have a Division model
 const OU = require('../models/OU'); // Assuming you have an OU model
@@ -19,7 +22,7 @@ router.get('/', async (req, res) => {
 });
 
 // Fetch a specific user with their Divisions and OUs (GET request)
-router.get('/:userId', async (req, res) => {
+router.get('/:userId',  async (req, res) => {
   try {
     // Find the user and populate the divisionsAndOUs field
     const user = await User.findById(req.params.userId)
@@ -49,7 +52,7 @@ router.get('/:userId', async (req, res) => {
 });
 
 // Assign user to Division and OU (POST request)
-router.post('/:userId/add-division', async (req, res) => {
+router.post('/:userId/add-division', authorizeRoles('admin'), async (req, res) => {
   const { userId } = req.params;
   const { division, ou } = req.body;
 
@@ -80,7 +83,7 @@ router.post('/:userId/add-division', async (req, res) => {
 });
 
 // Remove Division and OU from User (DELETE request)
-router.delete('/:userId/remove-division', async (req, res) => {
+router.delete('/:userId/remove-division', authorizeRoles('admin'), async (req, res) => {
   const { userId } = req.params;
   const { division, ou } = req.body;
 
@@ -111,7 +114,7 @@ router.delete('/:userId/remove-division', async (req, res) => {
 });
 
 // Change user role (PUT request)
-router.put('/:userId/role', async (req, res) => {
+router.put('/:userId/role', authorizeRoles('admin'), async (req, res) => {
   const { userId } = req.params;
   const { newRole } = req.body;
 

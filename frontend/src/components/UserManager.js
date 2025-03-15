@@ -6,7 +6,7 @@ import { Navigate } from 'react-router-dom'; // For redirecting unauthorized use
 
 const UserManager = () => {
   const [users, setUsers] = useState([]);
-  const [divisions, setDivisions] = useState([]);
+  const [divisions, setDivisions] = useState([]); // Track divisions
   const [organizationalUnits, setOrganizationalUnits] = useState([]);
   const [selectedOU, setSelectedOU] = useState(""); // Track selected OU
   const [error, setError] = useState(""); // Track error messages
@@ -19,7 +19,7 @@ const UserManager = () => {
   // Set unauthorized state if the user is not an admin
   useEffect(() => {
     if (role !== 'admin') {
-      console.log(role)
+      console.log(role);
       setIsUnauthorized(true);
     }
   }, [role]);
@@ -81,6 +81,11 @@ const UserManager = () => {
     fetchDivisions();
   }, [selectedOU, token, isUnauthorized]);
 
+  // Ensure that when a user is selected, the correct OU is set
+  const handleUserSelection = (user) => {
+    setSelectedOU(user?.ou); // This should link the selected user to their OU
+  };
+
   if (isUnauthorized) {
     return <Navigate to="/not-authorized" />;
   }
@@ -95,9 +100,10 @@ const UserManager = () => {
         <>
           <AssignUserForm
             users={users}
-            divisions={divisions}
+            divisions={divisions} // Pass divisions here
             organizationalUnits={organizationalUnits}
-            setSelectedOU={setSelectedOU} // Pass down state setter
+            setSelectedOU={setSelectedOU}
+            handleUserSelection={handleUserSelection} // Trigger user selection
           />
           <ChangeRoleForm users={users} />
         </>

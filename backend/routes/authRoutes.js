@@ -3,6 +3,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const Division = require('../models/Division'); 
+const OU = require('../models/OU'); 
+
+
 const router = express.Router();
 
 // Register User
@@ -51,25 +55,41 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    // Fetch division and OU names using the stored IDs
+    const updatedDivisionsAndOUs = await Promise.all(
+      user.divisionsAndOUs.map(async (pair) => {
+        const division = await Division.findById(pair.division).lean();
+        const ou = await OU.findById(pair.ou).lean();
+
+        return {
+          _id: pair._id,
+          division: division ? division.name : 'Unknown Division',
+          ou: ou ? ou.name : 'Unknown OU',
+        };
+      })
+    );
+
     // Generate JWT token with both id and role
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    // Send response with the generated token and user details
+    // Send response with the updated user object
     res.json({
       message: 'Login successful',
       token,
-      user: { // Include the user details you want
+      user: {
         _id: user._id,
         username: user.username,
         role: user.role,
-        divisionsAndOUs: user.divisionsAndOUs, // If needed, you can add more details here
-      }
+        divisionsAndOUs: updatedDivisionsAndOUs, // Now contains actual names
+      },
     });
   } catch (error) {
-    // Handle any unexpected errors
+    console.error("Error during login:", error);
     res.status(500).json({ message: 'Login failed', error: error.message });
   }
 });
+
+
 
 
 module.exports = router;

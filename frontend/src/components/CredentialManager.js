@@ -11,8 +11,6 @@ const CredentialManager = () => {
   const [selectedDivision, setSelectedDivision] = useState('');
   const [selectedOU, setSelectedOU] = useState('');
   const [credentials, setCredentials] = useState([]);
-  const [divisions, setDivisions] = useState([]);
-  const [organizationalUnits, setOrganizationalUnits] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentCredentialId, setCurrentCredentialId] = useState(null);
   const [error, setError] = useState(null);
@@ -22,26 +20,13 @@ const CredentialManager = () => {
   const user = JSON.parse(localStorage.getItem('user'));
   const role = user?.role;
 
-  // Fetch credentials only if the user has valid permissions
+  // Fetch credentials from the backend
   useEffect(() => {
     if (!role) return setIsUnauthorized(true); // If no role, deny access
 
     const fetchData = async () => {
       try {
-        const ouResponse = await axios.get('http://localhost:5000/api/ous', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setOrganizationalUnits(ouResponse.data || []);
-
-        if (selectedOU) {
-          const divResponse = await axios.get(`http://localhost:5000/api/divisions?ou=${selectedOU}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          setDivisions(divResponse.data.divisions || []);
-        } else {
-          setDivisions([]);
-        }
-
+        // Fetch Credentials
         const credResponse = await axios.get('http://localhost:5000/api/credentials', {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -57,7 +42,7 @@ const CredentialManager = () => {
     };
 
     fetchData();
-  }, [token, selectedOU, role]);
+  }, [token, role]);  // No dependency on selectedOU anymore
 
   const handleEditCredential = (credential) => {
     if (role !== 'management' && role !== 'admin') {
@@ -73,13 +58,17 @@ const CredentialManager = () => {
     setSelectedOU(credential.ou);
   };
 
-  const handleSubmitCredential = async () => {
+  const handleSubmitCredential = async (e) => {
+    e.preventDefault();
+
     if (!title || !username || !password || !selectedDivision || !selectedOU) {
       alert('All fields are required');
       return;
     }
 
-    const newCredential = { title, username, password, division: selectedDivision, ou: selectedOU };
+    const newCredential = {title, username, password, division: selectedDivision, ou: selectedOU };
+    console.log('New Credential:', newCredential);
+
 
     try {
       let response;
@@ -110,8 +99,6 @@ const CredentialManager = () => {
       setPassword('');
       setSelectedDivision('');
       setSelectedOU('');
-
-      window.location.reload();
     } catch (error) {
       if (error.response?.status === 403) {
         setError('Access Denied');
@@ -142,8 +129,6 @@ const CredentialManager = () => {
               password={password}
               selectedOU={selectedOU}
               selectedDivision={selectedDivision}
-              organizationalUnits={organizationalUnits}
-              divisions={divisions}
               setTitle={setTitle}
               setUsername={setUsername}
               setPassword={setPassword}
@@ -151,11 +136,17 @@ const CredentialManager = () => {
               setSelectedDivision={setSelectedDivision}
               handleSubmitCredential={handleSubmitCredential}
               isEditing={isEditing}
+              credentials={credentials}
+              user={user}
             />
           )}
 
           <h3>Existing Credentials</h3>
-          <CredentialTable credentials={credentials} handleEditCredential={handleEditCredential} />
+          <CredentialTable
+            credentials={credentials}
+            user={user} 
+            handleEditCredential={handleEditCredential}
+          />
         </>
       )}
     </div>

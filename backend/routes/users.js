@@ -22,17 +22,18 @@ router.get('/', async (req, res) => {
 });
 
 // Fetch a specific user with their Divisions and OUs (GET request)
-router.get('/:userId',  async (req, res) => {
+router.get('/:userId', async (req, res) => {
   try {
-    // Find the user and populate the divisionsAndOUs field
+    // Fetch user and populate division and OU names
     const user = await User.findById(req.params.userId)
-      .populate('divisionsAndOUs.division', 'name') // Populate division name
-      .populate('divisionsAndOUs.ou', 'name');     // Populate OU name
+      .populate('divisionsAndOUs.division', 'name')  // Populating division name
+      .populate('divisionsAndOUs.ou', 'name');      // Populating OU name
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    // Format the response to include the populated names in divisionsAndOUs
     res.json({
       success: true,
       user: {
@@ -40,8 +41,8 @@ router.get('/:userId',  async (req, res) => {
         username: user.username,
         divisionsAndOUs: user.divisionsAndOUs.map(pair => ({
           _id: pair._id,
-          division: pair.division.name, // Name of the division
-          ou: pair.ou.name              // Name of the OU
+          division: pair.division ? pair.division.name : 'Unknown Division', // Handle missing division name
+          ou: pair.ou ? pair.ou.name : 'Unknown OU' // Handle missing OU name
         }))
       }
     });
@@ -50,6 +51,8 @@ router.get('/:userId',  async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+
 
 // Assign user to Division and OU (POST request)
 router.post('/:userId/add-division', authorizeRoles('admin'), async (req, res) => {

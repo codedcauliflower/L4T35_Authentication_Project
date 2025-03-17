@@ -11,7 +11,7 @@ const CredentialTable = ({ credentials, user, handleEditCredential }) => {
 
   // Filter credentials based on user OUs and Divisions
   const filteredCredentials = credentials.filter(
-    (credential) => userOUs.has(credential.ou) || userDivisions.has(credential.division)
+    (credential) => userDivisions.has(credential.division)
   );
 
   return (
